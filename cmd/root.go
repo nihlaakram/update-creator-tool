@@ -72,10 +72,14 @@ func initConfig() {
 	logger.Debug(fmt.Sprintf("PATH_SEPARATOR: %s", constant.PATH_SEPARATOR))
 	logger.Debug("Config Values: ---------------------------")
 	logger.Debug(fmt.Sprintf("%s: %s", constant.CHECK_MD5_DISABLED, viper.GetString(constant.CHECK_MD5_DISABLED)))
-	logger.Debug(fmt.Sprintf("%s: %s", constant.RESOURCE_FILES_MANDATORY, viper.GetStringSlice(constant.RESOURCE_FILES_MANDATORY)))
-	logger.Debug(fmt.Sprintf("%s: %s", constant.RESOURCE_FILES_OPTIONAL, viper.GetStringSlice(constant.RESOURCE_FILES_OPTIONAL)))
-	logger.Debug(fmt.Sprintf("%s: %s", constant.RESOURCE_FILES_SKIP, viper.GetStringSlice(constant.RESOURCE_FILES_SKIP)))
-	logger.Debug(fmt.Sprintf("%s: %s", constant.PLATFORM_VERSIONS, viper.GetStringMapString(constant.PLATFORM_VERSIONS)))
+	logger.Debug(fmt.Sprintf("%s: %s", constant.RESOURCE_FILES_MANDATORY,
+		viper.GetStringSlice(constant.RESOURCE_FILES_MANDATORY)))
+	logger.Debug(fmt.Sprintf("%s: %s", constant.RESOURCE_FILES_OPTIONAL,
+		viper.GetStringSlice(constant.RESOURCE_FILES_OPTIONAL)))
+	logger.Debug(fmt.Sprintf("%s: %s", constant.RESOURCE_FILES_SKIP,
+		viper.GetStringSlice(constant.RESOURCE_FILES_SKIP)))
+	logger.Debug(fmt.Sprintf("%s: %s", constant.PLATFORM_VERSIONS,
+		viper.GetStringMapString(constant.PLATFORM_VERSIONS)))
 	logger.Debug("-----------------------------------------")
 }
 

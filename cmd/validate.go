@@ -48,7 +48,8 @@ func init() {
 //This function will be called when the validate command is called.
 func initializeValidateCommand(cmd *cobra.Command, args []string) {
 	if len(args) != 2 {
-		util.HandleErrorAndExit(errors.New("Invalid number of argumants. Run 'wum-uc validate --help' to view help."))
+		util.HandleErrorAndExit(errors.New("Invalid number of argumants. Run 'wum-uc validate --help' to " +
+			"view help."))
 	}
 	startValidation(args[0], args[1])
 }
@@ -65,19 +66,22 @@ func startValidation(updateFilePath, distributionLocation string) {
 
 	//Check whether the update has the zip extension
 	if !strings.HasSuffix(updateFilePath, ".zip") {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Update must be a zip file. Entered file '%s' does not have a zip extension.", updateFilePath)))
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Update must be a zip file. Entered file '%s' does "+
+			"not have a zip extension.", updateFilePath)))
 	}
 
 	//Check whether the update file exists
 	exists, err := util.IsFileExists(updateFilePath)
 	util.HandleErrorAndExit(err, "")
 	if !exists {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered update file does not exist at '%s'.", updateFilePath)))
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered update file does not exist at '%s'.",
+			updateFilePath)))
 	}
 
 	//Check whether the distribution has the zip extension
 	if !strings.HasSuffix(distributionLocation, ".zip") {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Distribution must be a zip file. Entered file '%s' does not have a zip extension.", distributionLocation)))
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Distribution must be a zip file. Entered file "+
+			"'%s' does not have a zip extension.", distributionLocation)))
 	}
 
 	//Set the product name in viper configs
@@ -90,7 +94,8 @@ func startValidation(updateFilePath, distributionLocation string) {
 	exists, err = util.IsFileExists(distributionLocation)
 	util.HandleErrorAndExit(err, fmt.Sprintf("Error occurred while checking '%s'", distributionLocation))
 	if !exists {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered distribution file does not exist at '%s'.", distributionLocation)))
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered distribution file does not exist at '%s'.",
+			distributionLocation)))
 	}
 
 	//Check update filename
@@ -98,7 +103,8 @@ func startValidation(updateFilePath, distributionLocation string) {
 	util.HandleErrorAndExit(err, "Error occurred while getting the information of update file")
 	match, err := regexp.MatchString(constant.FILENAME_REGEX, locationInfo.Name())
 	if !match {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Update filename '%s' does not match '%s' regular expression.", locationInfo.Name(), constant.FILENAME_REGEX)))
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Update filename '%s' does not match '%s' regular "+
+			"expression.", locationInfo.Name(), constant.FILENAME_REGEX)))
 	}
 
 	//Set the update name in viper configs
@@ -139,7 +145,9 @@ func compare(updateFileMap, distributionFileMap map[string]bool, updateDescripto
 			logger.Debug(fmt.Sprintf("found in resources: %v", foundInResources))
 			//check
 			if !isInAddedFiles && !foundInResources {
-				return errors.New("File not found in the distribution: '" + filePath + "'. If this is a new file, add an entry to the 'added_files' sections in the '" + constant.UPDATE_DESCRIPTOR_FILE + "' file")
+				return errors.New(fmt.Sprintf("File not found in the distribution: '%v'. If this is "+
+					"a new file, add an entry to the 'added_files' sections in the '%v' file",
+					filePath, constant.UPDATE_DESCRIPTOR_FILE))
 			} else {
 				logger.Debug("'" + filePath + "' found in added files.")
 			}
@@ -201,7 +209,8 @@ func readUpdateZip(filename string) (map[string]bool, *util.UpdateDescriptor, er
 				//check
 				err = util.ValidateUpdateDescriptor(&updateDescriptor)
 				if err != nil {
-					return nil, nil, errors.New("'" + constant.UPDATE_DESCRIPTOR_FILE + "' is invalid. " + err.Error())
+					return nil, nil, errors.New("'" + constant.UPDATE_DESCRIPTOR_FILE +
+						"' is invalid. " + err.Error())
 				}
 			case constant.LICENSE_FILE:
 				data, err := validateFile(file, constant.LICENSE_FILE, fullPath, updateName)
@@ -234,16 +243,21 @@ func readUpdateZip(filename string) (map[string]bool, *util.UpdateDescriptor, er
 				if !hasPrefix && !foundInResources {
 					return nil, nil, errors.New(fmt.Sprintf("Unknown file found: '%s'.", file.Name))
 				}
-				logger.Debug(fmt.Sprintf("Trimming: %s using %s", file.Name, prefix+constant.PATH_SEPARATOR))
+				logger.Debug(fmt.Sprintf("Trimming: %s using %s", file.Name,
+					prefix+constant.PATH_SEPARATOR))
 				relativePath := strings.TrimPrefix(file.Name, prefix+constant.PATH_SEPARATOR)
 				fileMap[relativePath] = false
 			}
 		}
 	}
 	if !isASecPatch && !isNotAContributionFileFound {
-		util.PrintWarning("This update is not a security update. But '" + constant.NOT_A_CONTRIBUTION_FILE + "' was not found. Please review and add '" + constant.NOT_A_CONTRIBUTION_FILE + "' file if necessary.")
+		util.PrintWarning(fmt.Sprintf("This update is not a security update. But '%v' was not found. Please "+
+			"review and add '%v' file if necessary.", constant.NOT_A_CONTRIBUTION_FILE,
+			constant.NOT_A_CONTRIBUTION_FILE))
 	} else if isASecPatch && isNotAContributionFileFound {
-		util.PrintWarning("This update is a security update. But '" + constant.NOT_A_CONTRIBUTION_FILE + "' was found. Please review and remove '" + constant.NOT_A_CONTRIBUTION_FILE + "' file if necessary.")
+		util.PrintWarning(fmt.Sprintf("This update is a security update. But '%v' was found. Please review "+
+			"and remove '%v' file if necessary.", constant.NOT_A_CONTRIBUTION_FILE,
+			constant.NOT_A_CONTRIBUTION_FILE))
 	}
 	return fileMap, &updateDescriptor, nil
 }
@@ -253,7 +267,8 @@ func validateFile(file *zip.File, fileName, fullPath, updateName string) ([]byte
 	logger.Debug(fmt.Sprintf("Validating '%s' at '%s' started.", fileName, fullPath))
 	parent := strings.TrimSuffix(file.Name, getFileName(file.FileInfo().Name()))
 	if file.Name != fullPath {
-		return nil, errors.New(fmt.Sprintf("'%s' found at '%s'. It should be in the '%s' directory.", fileName, parent, updateName))
+		return nil, errors.New(fmt.Sprintf("'%s' found at '%s'. It should be in the '%s' directory.", fileName,
+			parent, updateName))
 	} else {
 		logger.Debug(fmt.Sprintf("'%s' found at '%s'.", fileName, parent))
 	}
@@ -281,7 +296,8 @@ func validateFile(file *zip.File, fileName, fullPath, updateName string) ([]byte
 		isPatchWordFound = true
 	}
 	if isPatchWordFound {
-		util.PrintWarning(fmt.Sprintf("'%v' file contains the word 'patch' in following lines. Please review and change it to 'update' if possible.", fileName))
+		util.PrintWarning(fmt.Sprintf("'%v' file contains the word 'patch' in following lines. Please "+
+			"review and change it to 'update' if possible.", fileName))
 		for i, line := range allMatches {
 			util.PrintInfo(fmt.Sprintf("Matching Line #%d - %v", i+1, line[0]))
 		}
@@ -291,31 +307,38 @@ func validateFile(file *zip.File, fileName, fullPath, updateName string) ([]byte
 	// Check whether the all placeholders are removed
 	contains := strings.Contains(dataString, constant.UPDATE_NO_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.UPDATE_NO_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.UPDATE_NO_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 	contains = strings.Contains(dataString, constant.PLATFORM_NAME_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.PLATFORM_NAME_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.PLATFORM_NAME_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 	contains = strings.Contains(dataString, constant.PLATFORM_VERSION_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.PLATFORM_VERSION_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.PLATFORM_VERSION_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 	contains = strings.Contains(dataString, constant.APPLIES_TO_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.APPLIES_TO_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.APPLIES_TO_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 	contains = strings.Contains(dataString, constant.DESCRIPTION_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.DESCRIPTION_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.DESCRIPTION_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 	contains = strings.Contains(dataString, constant.JIRA_KEY_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.JIRA_KEY_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.JIRA_KEY_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 	contains = strings.Contains(dataString, constant.JIRA_SUMMARY_DEFAULT)
 	if contains {
-		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.", constant.JIRA_SUMMARY_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
+		util.PrintWarning(fmt.Sprintf("Please add the correct value for '%v' in the '%v' file.",
+			constant.JIRA_SUMMARY_DEFAULT, constant.UPDATE_DESCRIPTOR_FILE))
 	}
 
 	logger.Debug(fmt.Sprintf("Validating '%s' finished.", fileName))

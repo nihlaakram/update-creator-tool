@@ -86,7 +86,8 @@ func initializeInitCommand(cmd *cobra.Command, args []string) {
 		initDirectory(args[0])
 	default:
 		logger.Debug("Invalid number of argumants:", args)
-		util.HandleErrorAndExit(errors.New("Invalid number of argumants. Run 'wum-uc init --help' to view help."))
+		util.HandleErrorAndExit(errors.New("Invalid number of argumants. Run 'wum-uc init --help' to view " +
+			"help."))
 	}
 }
 
@@ -108,7 +109,8 @@ func initDirectory(destination string) {
 	if !exists {
 	userInputLoop:
 		for {
-			util.PrintInBold(fmt.Sprintf("'%s'does not exists. Do you want to create '%s' directory?[Y/n]: ", destination, destination))
+			util.PrintInBold(fmt.Sprintf("'%s'does not exists. Do you want to create '%s' directory?"+
+				"[Y/n]: ", destination, destination))
 			preference, err := util.GetUserInput()
 			if len(preference) == 0 {
 				preference = "y"
@@ -119,7 +121,8 @@ func initDirectory(destination string) {
 			userPreference := util.ProcessUserPreference(preference)
 			switch userPreference {
 			case constant.YES:
-				util.PrintInfo(fmt.Sprintf("'%s' directory does not exist. Creating '%s' directory.", destination, destination))
+				util.PrintInfo(fmt.Sprintf("'%s' directory does not exist. Creating '%s' directory.",
+					destination, destination))
 				err := util.CreateDirectory(destination)
 				util.HandleErrorAndExit(err)
 				logger.Debug(fmt.Sprintf("'%s' directory created.", destination))
@@ -176,13 +179,15 @@ func initDirectory(destination string) {
 	if err != nil {
 		absDestination = destination
 	}
-	util.PrintInfo(fmt.Sprintf("'%s' has been successfully created at '%s'.", constant.UPDATE_DESCRIPTOR_FILE, absDestination))
+	util.PrintInfo(fmt.Sprintf("'%s' has been successfully created at '%s'.", constant.UPDATE_DESCRIPTOR_FILE,
+		absDestination))
 
 	//Print whats next
 	color.Set(color.Bold)
 	fmt.Println("\nWhat's next?")
 	color.Unset()
-	fmt.Println(fmt.Sprintf("\trun 'wum-uc init --sample' to view a sample '%s' file.", constant.UPDATE_DESCRIPTOR_FILE))
+	fmt.Println(fmt.Sprintf("\trun 'wum-uc init --sample' to view a sample '%s' file.",
+		constant.UPDATE_DESCRIPTOR_FILE))
 }
 
 //This function will set default valued to the update-descriptor.yaml.
@@ -200,8 +205,8 @@ func setUpdateDescriptorDefaultValues(updateDescriptor *util.UpdateDescriptor) {
 	logger.Debug(fmt.Sprintf("bug_fixes: %v", bugFixes))
 }
 
-//This function will process the readme file and extract details to populate update-descriptor.yaml. If some data cannot
-// be extracted, it will add default value and continue.
+//This function will process the readme file and extract details to populate update-descriptor.yaml. If some data
+// cannot be extracted, it will add default value and continue.
 func processReadMe(directory string, updateDescriptor *util.UpdateDescriptor) {
 	logger.Debug("Processing README started")
 	// Construct the README.txt path
@@ -276,7 +281,8 @@ func processReadMe(directory string, updateDescriptor *util.UpdateDescriptor) {
 		} else if len(result) == 3 {
 			// If the result size is 3, 1st or 2nd string might contain the match. So we concat them
 			// together and trim the spaces. If one field has an empty string, it will be trimmed.
-			updateDescriptor.Applies_to = util.ProcessString(strings.TrimSpace(result[1]+result[2]), ", ", true)
+			updateDescriptor.Applies_to = util.ProcessString(strings.TrimSpace(result[1]+result[2]), ", ",
+				true)
 		} else {
 			logger.Debug("No matching results found for APPLIES_TO_REGEX:", result)
 		}

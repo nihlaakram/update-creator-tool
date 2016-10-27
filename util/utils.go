@@ -194,7 +194,8 @@ func ValidateUpdateDescriptor(updateDescriptor *UpdateDescriptor) error {
 		return err
 	}
 	if !matches {
-		return errors.New(fmt.Sprintf("'update_number' is not valid. It should match '%s'.", constant.UPDATE_NUMBER_REGEX))
+		return errors.New(fmt.Sprintf("'update_number' is not valid. It should match '%s'.",
+			constant.UPDATE_NUMBER_REGEX))
 	}
 	if len(updateDescriptor.Platform_version) == 0 {
 		return errors.New("'platform_version' field not found.")
@@ -204,7 +205,8 @@ func ValidateUpdateDescriptor(updateDescriptor *UpdateDescriptor) error {
 		return err
 	}
 	if !matches {
-		return errors.New(fmt.Sprintf("'platform_version' is not valid. It should match '%s'.", constant.KERNEL_VERSION_REGEX))
+		return errors.New(fmt.Sprintf("'platform_version' is not valid. It should match '%s'.",
+			constant.KERNEL_VERSION_REGEX))
 	}
 	if len(updateDescriptor.Platform_name) == 0 {
 		return errors.New("'platform_name' field not found.")
