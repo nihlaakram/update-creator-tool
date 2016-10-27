@@ -27,4 +27,4 @@ _testmain.go
 
 /build/
 /.idea/
-/wum-uc.iml
+*.iml
