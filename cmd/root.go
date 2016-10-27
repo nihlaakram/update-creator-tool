@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	Version string
+	Version   string
 	BuildDate string
 
 	//Create the logger
@@ -30,7 +30,7 @@ var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use: "wum-uc",
+	Use:   "wum-uc",
 	Short: "This tool is used to create and validate updates",
 	Long:  "This tool is used to create and validate updates.",
 }

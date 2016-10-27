@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	initCmdUse = "init"
+	initCmdUse       = "init"
 	initCmdShortDesc = "Generate '" + constant.UPDATE_DESCRIPTOR_FILE + "' file template"
-	initCmdLongDesc = dedent.Dedent(`
+	initCmdLongDesc  = dedent.Dedent(`
 		This command will generate the 'update-descriptor.yaml' file. If
 		the user does not specify a directory, it will use the current
 		working directory. It will fill the data using any available
@@ -52,10 +52,10 @@ file_changes:
 
 // initCmd represents the validate command
 var initCmd = &cobra.Command{
-	Use: initCmdUse,
+	Use:   initCmdUse,
 	Short: initCmdShortDesc,
-	Long: initCmdLongDesc,
-	Run: initializeInitCommand,
+	Long:  initCmdLongDesc,
+	Run:   initializeInitCommand,
 }
 
 //This function will be called first and this will add flags to the command.
@@ -106,7 +106,7 @@ func initDirectory(destination string) {
 	// If the directory does not exists, prompt the user
 	skip := false
 	if !exists {
-		userInputLoop:
+	userInputLoop:
 		for {
 			util.PrintInBold(fmt.Sprintf("'%s'does not exists. Do you want to create '%s' directory?[Y/n]: ", destination, destination))
 			preference, err := util.GetUserInput()
@@ -117,7 +117,7 @@ func initDirectory(destination string) {
 
 			// Get the user preference
 			userPreference := util.ProcessUserPreference(preference)
-			switch(userPreference){
+			switch userPreference {
 			case constant.YES:
 				util.PrintInfo(fmt.Sprintf("'%s' directory does not exist. Creating '%s' directory.", destination, destination))
 				err := util.CreateDirectory(destination)
@@ -159,7 +159,7 @@ func initDirectory(destination string) {
 	// Save the update descriptor
 	file, err := os.OpenFile(
 		updateDescriptorFile,
-		os.O_WRONLY | os.O_TRUNC | os.O_CREATE,
+		os.O_WRONLY|os.O_TRUNC|os.O_CREATE,
 		0600,
 	)
 	util.HandleErrorAndExit(err)
@@ -276,7 +276,7 @@ func processReadMe(directory string, updateDescriptor *util.UpdateDescriptor) {
 		} else if len(result) == 3 {
 			// If the result size is 3, 1st or 2nd string might contain the match. So we concat them
 			// together and trim the spaces. If one field has an empty string, it will be trimmed.
-			updateDescriptor.Applies_to = util.ProcessString(strings.TrimSpace(result[1] + result[2]), ", ", true)
+			updateDescriptor.Applies_to = util.ProcessString(strings.TrimSpace(result[1]+result[2]), ", ", true)
 		} else {
 			logger.Debug("No matching results found for APPLIES_TO_REGEX:", result)
 		}

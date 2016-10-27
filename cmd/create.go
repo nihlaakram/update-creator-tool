@@ -54,9 +54,9 @@ func createNewNode() node {
 
 // Values used to print help command.
 var (
-	createCmdUse = "create <update_dir> <dist_loc>"
+	createCmdUse       = "create <update_dir> <dist_loc>"
 	createCmdShortDesc = "Create a new update"
-	createCmdLongDesc = dedent.Dedent(`
+	createCmdLongDesc  = dedent.Dedent(`
 		This command will create a new update zip file from the files in the
 		given directory. To generate the directory structure, it requires the
 		product distribution zip file path as input.`)
@@ -64,10 +64,10 @@ var (
 
 // createCmd represents the create command.
 var createCmd = &cobra.Command{
-	Use: createCmdUse,
+	Use:   createCmdUse,
 	Short: createCmdShortDesc,
-	Long: createCmdLongDesc,
-	Run: initializeCreateCommand,
+	Long:  createCmdLongDesc,
+	Run:   initializeCreateCommand,
 }
 
 // This function will be called first and this will add flags to the command.
@@ -167,7 +167,7 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 
 	// Get the product name from the distribution path and set it as a viper config
 	paths := strings.Split(distributionPath, constant.PATH_SEPARATOR)
-	distributionName := strings.TrimSuffix(paths[len(paths) - 1], ".zip")
+	distributionName := strings.TrimSuffix(paths[len(paths)-1], ".zip")
 	viper.Set(constant.PRODUCT_NAME, distributionName)
 
 	// Read the distribution zip file
@@ -203,7 +203,7 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 		logger.Debug(fmt.Sprintf("matches: %v", matches))
 
 		// Now we can act according to the number of matches we found
-		switch len(matches){
+		switch len(matches) {
 		// No match found in the distribution for the given directory
 		case 0:
 			// Handle the no match situation
@@ -241,7 +241,7 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 		logger.Debug(fmt.Sprintf("matches: %v", matches))
 
 		// Now we can act according to the number of matches we found
-		switch len(matches){
+		switch len(matches) {
 		// No match found in the distribution for the given file
 		case 0:
 			// Handle the no match situation
@@ -329,7 +329,7 @@ func handleNoMatch(filename string, isDir bool, allFilesMap map[string]data, roo
 
 		// Act according to the user preference
 		userPreference := util.ProcessUserPreference(preference)
-		switch(userPreference){
+		switch userPreference {
 		case constant.YES:
 			// Handle the file/directory as new
 			err = handleNewFile(filename, isDir, rootNode, allFilesMap, updateDescriptor)
@@ -349,7 +349,7 @@ func handleNoMatch(filename string, isDir bool, allFilesMap map[string]data, roo
 func handleNewFile(filename string, isDir bool, rootNode *node, allFilesMap map[string]data, updateDescriptor *util.UpdateDescriptor) error {
 	logger.Debug(fmt.Sprintf("[HANDLE NEW] %s", filename))
 
-	readDestinationLoop:
+readDestinationLoop:
 	for {
 		// Get user preference
 		util.PrintInBold("Enter destination directory relative to CARBON_HOME: ")
@@ -380,7 +380,7 @@ func handleNewFile(filename string, isDir bool, rootNode *node, allFilesMap map[
 			// entered directory.
 			logger.Debug("Checking:", relativeLocationInDistribution)
 			exists = PathExists(rootNode, relativeLocationInDistribution, true)
-			logger.Debug(relativeLocationInDistribution + " exists:", exists)
+			logger.Debug(relativeLocationInDistribution+" exists:", exists)
 		}
 
 		// If the directory is already in the distribution
@@ -417,7 +417,7 @@ func handleNewFile(filename string, isDir bool, rootNode *node, allFilesMap map[
 				util.HandleErrorAndExit(err, "Error occurred while getting input from the user.")
 
 				userPreference := util.ProcessUserPreference(preference)
-				switch(userPreference){
+				switch userPreference {
 				case constant.YES:
 					updateRoot := viper.GetString(constant.UPDATE_ROOT)
 					// Get all matching files. By matching files, we mean all the files which are in the directory and subdirectories.
@@ -664,10 +664,10 @@ func readDirectory(root string, ignoredFiles map[string]bool) (map[string]data, 
 			}
 		}
 		// Get the relative path. This is used as the key of the map
-		relativePath := strings.TrimPrefix(absolutePath, root + "/")
+		relativePath := strings.TrimPrefix(absolutePath, root+"/")
 		// Create the data struct which will have the other details
 		info := data{
-			name: fileInfo.Name(),
+			name:         fileInfo.Name(),
 			relativePath: relativePath,
 		}
 		if fileInfo.IsDir() {
@@ -734,7 +734,7 @@ func readZip(location string) (node, error) {
 
 		// Get the relative path of the file
 		logger.Trace(fmt.Sprintf("file.Name: %s", file.Name))
-		relativePath := strings.TrimPrefix(file.Name, productName + "/")
+		relativePath := strings.TrimPrefix(file.Name, productName+"/")
 		// Replace all \ with /. Otherwise it will cause issues in Windows OS.
 		relativePath = filepath.ToSlash(relativePath)
 		logger.Trace(fmt.Sprintf("relativePath: %s", relativePath))
@@ -905,7 +905,7 @@ func saveUpdateDescriptor(updateDescriptorFilename string, data []byte) error {
 	// Open a new file for writing only
 	file, err := os.OpenFile(
 		destination,
-		os.O_WRONLY | os.O_TRUNC | os.O_CREATE,
+		os.O_WRONLY|os.O_TRUNC|os.O_CREATE,
 		0600,
 	)
 	defer file.Close()

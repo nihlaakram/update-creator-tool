@@ -4,6 +4,7 @@ package util
 
 import (
 	"testing"
+
 	"github.com/wso2/update-creator-tool/constant"
 )
 
@@ -185,7 +186,7 @@ func TestValidateUpdateDescriptor(t *testing.T) {
 	}
 
 	updateDescriptor.Bug_fixes = map[string]string{
-		"N/A":"N/A",
+		"N/A": "N/A",
 	}
 	err = ValidateUpdateDescriptor(&updateDescriptor)
 	if err == nil {

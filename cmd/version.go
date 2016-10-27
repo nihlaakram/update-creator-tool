@@ -14,8 +14,8 @@ import (
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Display wum-uc version information",
-	Long: `Display wum-uc version information.`,
-	Run: versionCommand,
+	Long:  `Display wum-uc version information.`,
+	Run:   versionCommand,
 }
 
 func init() {

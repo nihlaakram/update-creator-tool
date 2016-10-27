@@ -38,10 +38,10 @@ type UpdateDescriptor struct {
 	Bug_fixes        map[string]string
 	Description      string
 	File_changes     struct {
-				 Added_files    []string
-				 Removed_files  []string
-				 Modified_files []string
-			 }
+		Added_files    []string
+		Removed_files  []string
+		Modified_files []string
+	}
 }
 
 // Structs to get the summary field from the jira response
@@ -92,7 +92,7 @@ func CleanUpDirectory(path string) {
 }
 
 // This function handles keyboard interrupts
-func HandleInterrupts(cleanupFunc func()) chan <- os.Signal {
+func HandleInterrupts(cleanupFunc func()) chan<- os.Signal {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
@@ -127,12 +127,12 @@ func GetUserInput() (string, error) {
 
 // This function will process user input and identify the type of preference
 func ProcessUserPreference(preference string) int {
-	if strings.ToLower(preference) == "yes" || (len(preference) == 1 && strings.ToLower(preference) == "y" ) {
+	if strings.ToLower(preference) == "yes" || (len(preference) == 1 && strings.ToLower(preference) == "y") {
 		return constant.YES
-	} else if strings.ToLower(preference) == "no" || (len(preference) == 1 && strings.ToLower(preference) == "n" ) {
+	} else if strings.ToLower(preference) == "no" || (len(preference) == 1 && strings.ToLower(preference) == "n") {
 		return constant.NO
 	} else if strings.ToLower(preference) == "reenter" || strings.ToLower(preference) == "re-enter" ||
-		(len(preference) == 1 && strings.ToLower(preference) == "r"  ) {
+		(len(preference) == 1 && strings.ToLower(preference) == "r") {
 		return constant.REENTER
 	}
 	return constant.OTHER
@@ -153,7 +153,7 @@ func IsUserPreferencesValid(preferences []string, noOfAvailableChoices int) (boo
 	if first < 0 {
 		return false, errors.New(message)
 	}
-	last, err := strconv.Atoi(preferences[length - 1])
+	last, err := strconv.Atoi(preferences[length-1])
 	if err != nil {
 		return false, err
 	}
@@ -377,7 +377,7 @@ func PrintInBold(args ...interface{}) {
 func GetJiraSummary(id string) string {
 	defaultResponse := constant.JIRA_SUMMARY_DEFAULT
 	logger.Debug(fmt.Sprintf("Getting Jira summary for: %s", id))
-	req, err := http.NewRequest("GET", constant.JIRA_API_URL + id, nil)
+	req, err := http.NewRequest("GET", constant.JIRA_API_URL+id, nil)
 	logger.Trace(fmt.Sprintf("Request: %v", req))
 	if err != nil {
 		logger.Debug(fmt.Sprintf("Error occurred while creating a new request: %v", err))

@@ -14,7 +14,7 @@ func TestGetUpdateName(t *testing.T) {
 	updateNumber := "0001"
 	kernelVersion := "4.4.0"
 	updateDescriptor := util.UpdateDescriptor{
-		Update_number: updateNumber,
+		Update_number:    updateNumber,
 		Platform_version: kernelVersion,
 	}
 	updateName := getUpdateName(&updateDescriptor, constant.UPDATE_NAME_PREFIX)
