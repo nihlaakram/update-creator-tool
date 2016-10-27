@@ -1,4 +1,16 @@
 // Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package cmd
 
@@ -54,9 +66,9 @@ func createNewNode() node {
 
 // Values used to print help command.
 var (
-	createCmdUse       = "create <update_dir> <dist_loc>"
+	createCmdUse = "create <update_dir> <dist_loc>"
 	createCmdShortDesc = "Create a new update"
-	createCmdLongDesc  = dedent.Dedent(`
+	createCmdLongDesc = dedent.Dedent(`
 		This command will create a new update zip file from the files in the
 		given directory. To generate the directory structure, it requires the
 		product distribution zip file path as input.`)
@@ -105,7 +117,7 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 	util.HandleErrorAndExit(err, "Error occurred while reading the update directory")
 	logger.Debug(fmt.Sprintf("exists: %v", exists))
 	if !exists {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Directory does not exist at '%s'. Update location "+
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Directory does not exist at '%s'. Update location " +
 			"must be a directory.", updateDirectoryPath)))
 	}
 	updateRoot := strings.TrimSuffix(updateDirectoryPath, constant.PATH_SEPARATOR)
@@ -128,11 +140,11 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 	exists, err = util.IsFileExists(distributionPath)
 	util.HandleErrorAndExit(err, fmt.Sprintf("Error occurred while checking '%s'", distributionPath))
 	if !exists {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("File does not exist at '%s'. Distribution must "+
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("File does not exist at '%s'. Distribution must " +
 			"be a zip file.", distributionPath)))
 	}
 	if !strings.HasSuffix(distributionPath, ".zip") {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered update location '%s' does not have a "+
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered update location '%s' does not have a " +
 			"'zip' extention.", distributionPath)))
 	}
 
@@ -170,13 +182,13 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 	// rootNode is what we use as the root of the distribution when we populate tree like structure.
 	rootNode := createNewNode()
 	if !strings.HasSuffix(distributionPath, ".zip") {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered distribution path(%s) does not point to a "+
+		util.HandleErrorAndExit(errors.New(fmt.Sprintf("Entered distribution path(%s) does not point to a " +
 			"zip file.", distributionPath)))
 	}
 
 	// Get the product name from the distribution path and set it as a viper config
 	paths := strings.Split(distributionPath, constant.PATH_SEPARATOR)
-	distributionName := strings.TrimSuffix(paths[len(paths)-1], ".zip")
+	distributionName := strings.TrimSuffix(paths[len(paths) - 1], ".zip")
 	viper.Set(constant.PRODUCT_NAME, distributionName)
 
 	// Read the distribution zip file
@@ -326,7 +338,7 @@ func getUpdateName(updateDescriptor *util.UpdateDescriptor, updateNamePrefix str
 // This function will handle no match found for a file situations. User input is required and based on the user input,
 // this function will decide how to proceed.
 func handleNoMatch(filename string, isDir bool, allFilesMap map[string]data, rootNode *node,
-	updateDescriptor *util.UpdateDescriptor) error {
+updateDescriptor *util.UpdateDescriptor) error {
 	//todo: Check OSGi bundles in the plugins directory
 	logger.Debug(fmt.Sprintf("[NO MATCH] %s", filename))
 	util.PrintInBold(fmt.Sprintf("'%s' not found in distribution. ", filename))
@@ -360,10 +372,10 @@ func handleNoMatch(filename string, isDir bool, allFilesMap map[string]data, roo
 // This function will handle the situations where the user want to add a file as a new file which was not found in the
 // distribution.
 func handleNewFile(filename string, isDir bool, rootNode *node, allFilesMap map[string]data,
-	updateDescriptor *util.UpdateDescriptor) error {
+updateDescriptor *util.UpdateDescriptor) error {
 	logger.Debug(fmt.Sprintf("[HANDLE NEW] %s", filename))
 
-readDestinationLoop:
+	readDestinationLoop:
 	for {
 		// Get user preference
 		util.PrintInBold("Enter destination directory relative to CARBON_HOME: ")
@@ -395,7 +407,7 @@ readDestinationLoop:
 			// the entered directory.
 			logger.Debug("Checking:", relativeLocationInDistribution)
 			exists = PathExists(rootNode, relativeLocationInDistribution, true)
-			logger.Debug(relativeLocationInDistribution+" exists:", exists)
+			logger.Debug(relativeLocationInDistribution + " exists:", exists)
 		}
 
 		// If the directory is already in the distribution
@@ -486,7 +498,7 @@ readDestinationLoop:
 
 // This function will situations where a single match is found in the distribution.
 func handleSingleMatch(filename string, matchingNode *node, isDir bool, allFilesMap map[string]data, rootNode *node,
-	updateDescriptor *util.UpdateDescriptor) error {
+updateDescriptor *util.UpdateDescriptor) error {
 	logger.Debug(fmt.Sprintf("[SINGLE MATCH] %s ; match: %s", filename, matchingNode.relativeLocation))
 	updateRoot := viper.GetString(constant.UPDATE_ROOT)
 	if isDir {
@@ -505,7 +517,7 @@ func handleSingleMatch(filename string, matchingNode *node, isDir bool, allFiles
 				fileLocation := path.Join(matchingNode.relativeLocation, match)
 				md5Matches := CheckMD5(rootNode, strings.Split(fileLocation, "/"), data.md5)
 				if md5Matches {
-					util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 matches with "+
+					util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 matches with " +
 						"the already existing file.", match))
 					logger.Debug("MD5 matches. Ignoring file.")
 					continue
@@ -528,7 +540,7 @@ func handleSingleMatch(filename string, matchingNode *node, isDir bool, allFiles
 			fileLocation := path.Join(matchingNode.relativeLocation, filename)
 			md5Matches := CheckMD5(rootNode, strings.Split(fileLocation, "/"), data.md5)
 			if md5Matches {
-				util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 matches with the "+
+				util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 matches with the " +
 					"already existing file.", filename))
 				logger.Debug("MD5 matches. Ignoring file.")
 				// If md5 does not match, return
@@ -549,7 +561,7 @@ func handleSingleMatch(filename string, matchingNode *node, isDir bool, allFiles
 
 // This function will handle multiple match situations. In here user input is required.
 func handleMultipleMatches(filename string, isDir bool, matches map[string]*node, allFilesMap map[string]data,
-	rootNode *node, updateDescriptor *util.UpdateDescriptor) error {
+rootNode *node, updateDescriptor *util.UpdateDescriptor) error {
 
 	util.PrintInfo(fmt.Sprintf("Multiple matches found for '%s' in the distribution.", filename))
 
@@ -621,7 +633,7 @@ func handleMultipleMatches(filename string, isDir bool, matches map[string]*node
 					fileLocation := strings.Split(path.Join(pathInDistribution, match), "/")
 					md5Matches := CheckMD5(rootNode, fileLocation, data.md5)
 					if md5Matches {
-						util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 "+
+						util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 " +
 							"matches with the already existing file.", match))
 						logger.Debug("MD5 matches. Ignoring file.")
 						continue
@@ -647,7 +659,7 @@ func handleMultipleMatches(filename string, isDir bool, matches map[string]*node
 				if md5Matches {
 					// If md5 matches, print warning msg and continue with the next selected
 					// location
-					util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 matches "+
+					util.PrintInfo(fmt.Sprintf("File '%v' not copied because MD5 matches " +
 						"with the already existing file.", filename))
 					logger.Debug("MD5 matches. Ignoring file.")
 					continue
@@ -682,7 +694,7 @@ func getAllMatchingFiles(path string, allFilesMap map[string]data) []string {
 
 // This function will read the directory in the given location and return 3 values and an error if any exists.
 func readDirectory(root string, ignoredFiles map[string]bool) (map[string]data, map[string]bool, map[string]bool,
-	error) {
+error) {
 	allFilesMap := make(map[string]data)
 	rootLevelDirectoriesMap := make(map[string]bool)
 	rootLevelFilesMap := make(map[string]bool)
@@ -709,7 +721,7 @@ func readDirectory(root string, ignoredFiles map[string]bool) (map[string]data, 
 			}
 		}
 		// Get the relative path. This is used as the key of the map
-		relativePath := strings.TrimPrefix(absolutePath, root+"/")
+		relativePath := strings.TrimPrefix(absolutePath, root + "/")
 		// Create the data struct which will have the other details
 		info := data{
 			name:         fileInfo.Name(),
@@ -781,7 +793,7 @@ func readZip(location string) (node, error) {
 
 		// Get the relative path of the file
 		logger.Trace(fmt.Sprintf("file.Name: %s", file.Name))
-		relativePath := strings.TrimPrefix(file.Name, productName+"/")
+		relativePath := strings.TrimPrefix(file.Name, productName + "/")
 		// Replace all \ with /. Otherwise it will cause issues in Windows OS.
 		relativePath = filepath.ToSlash(relativePath)
 		logger.Trace(fmt.Sprintf("relativePath: %s", relativePath))
@@ -954,7 +966,7 @@ func saveUpdateDescriptor(updateDescriptorFilename string, data []byte) error {
 	// Open a new file for writing only
 	file, err := os.OpenFile(
 		destination,
-		os.O_WRONLY|os.O_TRUNC|os.O_CREATE,
+		os.O_WRONLY | os.O_TRUNC | os.O_CREATE,
 		0600,
 	)
 	defer file.Close()
@@ -1001,7 +1013,7 @@ func copyResourceFilesToTempDir(resourceFilesMap map[string]bool) error {
 
 // This will generate the location table and the index map which will be used to get user preference.
 func generateLocationTable(filename string, locationsInDistribution map[string]*node) (*tablewriter.Table,
-	map[string]string) {
+map[string]string) {
 	// This is used to show the information to the user.
 	locationTable := tablewriter.NewWriter(os.Stdout)
 	locationTable.SetAlignment(tablewriter.ALIGN_LEFT)
@@ -1033,7 +1045,7 @@ func generateLocationTable(filename string, locationsInDistribution map[string]*
 
 //This function will copy the file/directory from update to temp location.
 func copyFile(filename string, locationInUpdate, relativeLocationInTemp string, rootNode *node,
-	updateDescriptor *util.UpdateDescriptor) error {
+updateDescriptor *util.UpdateDescriptor) error {
 	logger.Debug(fmt.Sprintf("[FINAL][COPY ROOT] Name: %s ; IsDir: false ; From: %s ; To: %s", filename,
 		locationInUpdate, relativeLocationInTemp))
 	updateName := viper.GetString(constant.UPDATE_NAME)
