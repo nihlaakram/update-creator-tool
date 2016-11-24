@@ -311,7 +311,7 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 	targetDirectory = strings.Replace(targetDirectory, "/", constant.PATH_SEPARATOR, -1)
 
 	logger.Debug(fmt.Sprintf("targetDirectory: %s", targetDirectory))
-	err = archiver.Zip(updateZipName, []string{targetDirectory})
+	err = archiver.Zip.Make(updateZipName, []string{targetDirectory})
 	util.HandleErrorAndExit(err)
 
 	// Remove the temp directories
