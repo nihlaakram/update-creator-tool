@@ -3,6 +3,11 @@
 target="wum-uc.go"
 version="1.0.0"
 
+type glide >/dev/null 2>&1 || { echo >&2 "Glide dependency management is needed to build the Update Creator Tool (https://glide.sh/).  Aborting."; exit 1; }
+
+echo "Setting up dependencies..."
+glide install
+
 platforms="darwin/amd64/macosx/x64 linux/386/linux/i586 linux/amd64/linux/x64 windows/386/windows/i586 windows/amd64/windows/x64"
 
 for platform in ${platforms}
