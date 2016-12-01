@@ -721,7 +721,12 @@ error) {
 			}
 		}
 		// Get the relative path. This is used as the key of the map
-		relativePath := strings.TrimPrefix(absolutePath, root + "/")
+		trimPattern := root + "/"
+		if strings.HasSuffix(root, "/") {
+			trimPattern = root
+		}
+
+		relativePath := strings.TrimPrefix(absolutePath, trimPattern)
 		// Create the data struct which will have the other details
 		info := data{
 			name:         fileInfo.Name(),
