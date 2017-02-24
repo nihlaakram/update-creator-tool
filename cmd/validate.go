@@ -372,7 +372,14 @@ func readDistributionZip(filename string) (map[string]bool, error) {
 	// Iterate through each file/dir found in
 	for _, file := range zipReader.Reader.File {
 		logger.Trace(file.Name)
-		relativePath := strings.TrimPrefix(file.Name, productName+"/")
+
+		var relativePath string
+		if (strings.Contains(file.Name, "/")) {
+			relativePath = strings.SplitN(file.Name, "/", 2)[1]
+		} else {
+			relativePath = file.Name
+		}
+
 		if !file.FileInfo().IsDir() {
 			fileMap[relativePath] = false
 		}
