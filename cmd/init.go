@@ -50,7 +50,7 @@ platform_name: wilkes
 applies_to: All the products based on carbon 4.4.1
 bug_fixes:
   CARBON-15395: Upgrade Hazelcast version to 3.5.2
-  <MORE_JIRAS_HERE>
+  <Multiple JIRAs or GITHUB Issues>
 description: |
   This update contain the relavent fixes for upgrading Hazelcast version
   to its latest 3.5.2 version. When applying this update it requires a

@@ -39,7 +39,7 @@ do
     destination="${zipdir}/bin/${output}"
 
     #echo "GOOS=$goos GOARCH=$goarch go build -x -o $destination $target"
-    GOOS=${goos} GOARCH=${goarch} go build -ldflags "-X main.version=${version} -X 'main.buildDate=$(date -u '+%Y-%m-%d %H:%M:%S')'" -o ${destination} ${target}
+    GOOS=${goos} GOARCH=${goarch} go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -ldflags "-X main.version=${version} -X 'main.buildDate=$(date -u '+%Y-%m-%d %H:%M:%S')'" -o ${destination} ${target}
 
     pwd=`pwd`
     cd "$(dirname ${target})/build/target"
