@@ -127,7 +127,9 @@ If the **UPDATE_LOCATION** contained the update 0001, by running this command, y
 
 #### validation command
 
-After we create a update, we might want to unzip it and add more detail to the **update-descriptor.yaml** like removed files. After we do these changes, we can use this validation command to verify that the file structure of the zip is is the same as the distribution.
+After we create a update, we might want to unzip it and add more detail to the **update-descriptor.yaml** like removed files. After we do these changes, we can use this validation command to verify that the file structure of the zip is is the same as the distribution. 
+
+The `LICENSE_MD5` environment variable should be set to the expected MD5 license checksum in order to validate the LICENSE.txt contents.
 
 ```bash
 wum-uc validate <update_loc> <dist_loc> [<flags>]

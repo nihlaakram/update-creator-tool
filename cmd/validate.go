@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"archive/zip"
+	"crypto/md5"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -38,7 +39,9 @@ var (
 	validateCmdLongDesc  = dedent.Dedent(`
 		This command will validate the given update zip. Files will be
 		matched against the given distribution. This will also validate
-		the structure of the update-descriptor.yaml file as well.`)
+		the structure of the update-descriptor.yaml file as well.
+		Please set LICENSE_MD5 environment variable to the expected
+		md5 value of the LICENSE.txt file.`)
 )
 
 // ValidateCmd represents the validate command
@@ -62,6 +65,10 @@ func initializeValidateCommand(cmd *cobra.Command, args []string) {
 	if len(args) != 2 {
 		util.HandleErrorAndExit(errors.New("Invalid number of argumants. Run 'wum-uc validate --help' to " +
 			"view help."))
+	}
+	// Check if LICENSE_MD5 environment is set and valid.
+	if len(os.Getenv("LICENSE_MD5")) == 0 {
+		util.HandleErrorAndExit(errors.New("Environment variable 'LICENSE_MD5' is not set."))
 	}
 	startValidation(args[0], args[1])
 }
@@ -289,6 +296,20 @@ func validateFile(file *zip.File, fileName, fullPath, updateName string) ([]byte
 		return nil, err
 	}
 	zippedFile.Close()
+	// Validate checksum of the LICENSE.txt file.
+	if fileName == constant.LICENSE_FILE {
+		logger.Debug(fmt.Sprintf("Checking MD5 of the '%s'", fileName))
+		actualLicenseMD5Sum := fmt.Sprintf("%x", md5.Sum(data))
+		actualLicenseMD5Sum = strings.ToLower(actualLicenseMD5Sum)
+		expectedLicenseMD5Sum := os.Getenv("LICENSE_MD5")
+		if actualLicenseMD5Sum != expectedLicenseMD5Sum {
+			logger.Debug(fmt.Sprintf("MD5 checksum failed for the file '%s': " +
+				"Expected-'%s', Actual-'%s'", fileName, expectedLicenseMD5Sum,
+				actualLicenseMD5Sum))
+			return nil, errors.New(fmt.Sprintf("'%s' in '%s' is invalid.",
+				fileName, parent))
+		}
+	}
 
 	dataString := string(data)
 	dataString = util.ProcessString(dataString, "\n", true)
