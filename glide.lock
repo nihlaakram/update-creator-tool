@@ -1,13 +1,6 @@
-hash: 69248e39eb355716de38b8845f246900bc7cfc8d0f71485b95623bd99e2949aa
-updated: 2016-12-01T10:39:27.351061233+05:30
+hash: bd2e4bd69e4282d1084396198e82a7f79be0873387a6ee183e4b9bcd627d32eb
+updated: 2018-02-22T17:23:35.283250043+05:30
 imports:
-- name: github.com/dsnet/compress
-  version: b9aab3c6a04eef14c56384b4ad065e7b73438862
-  subpackages:
-  - bzip2
-  - bzip2/internal/sais
-  - internal
-  - internal/prefix
 - name: github.com/fatih/color
   version: dea9d3a26a087187530244679c1cfb3a42937794
 - name: github.com/fsnotify/fsnotify
@@ -41,12 +34,8 @@ imports:
   version: 30a891c33c7cde7b02a981314b4228ec99380cca
 - name: github.com/mattn/go-runewidth
   version: 737072b4e32b7a5018b4a7125da8d12de90e8045
-- name: github.com/mholt/archiver
-  version: cdc68dd1f170b8dfc1a0d2231b5bb0967ed67006
 - name: github.com/mitchellh/mapstructure
   version: f3009df150dadf309fdee4a54ed65c124afad715
-- name: github.com/nwaples/rardecode
-  version: f94841372ddc36be531a5c3e1206238e32e93d74
 - name: github.com/olekukonko/tablewriter
   version: bdcc175572fd7abece6c831e643891b9331bc9e7
 - name: github.com/pelletier/go-buffruneio
@@ -81,12 +70,6 @@ imports:
   version: ad0ff2e232ad2e37faf67087fb24bf8d04a8ce20
   subpackages:
   - msgp
-- name: github.com/ulikunitz/xz
-  version: 3e84f9193f6ec5cd5998463d64c88f798356b0c9
-  subpackages:
-  - internal/hash
-  - internal/xlog
-  - lzma
 - name: golang.org/x/sys
   version: d5645953809d8b4752afb2c3224b1f1ad73dfa70
   subpackages:

@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -29,7 +30,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mholt/archiver"
 	"github.com/olekukonko/tablewriter"
 	"github.com/renstrom/dedent"
 	"github.com/spf13/cobra"
@@ -305,7 +305,7 @@ func createUpdate(updateDirectoryPath, distributionPath string) {
 	targetDirectory = strings.Replace(targetDirectory, "/", constant.PATH_SEPARATOR, -1)
 
 	logger.Debug(fmt.Sprintf("targetDirectory: %s", targetDirectory))
-	err = archiver.Zip.Make(updateZipName, []string{targetDirectory})
+	err = ZipFile(targetDirectory, updateZipName)
 	util.HandleErrorAndExit(err)
 
 	// Remove the temp directories
@@ -1084,4 +1084,67 @@ func copyFile(filename string, locationInUpdate, relativeLocationInTemp string, 
 			relativePath)
 	}
 	return nil
+}
+
+//This function will create a zip file from the source to the target folder
+func ZipFile(source, target string) error {
+	zipfile, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer zipfile.Close()
+
+	archive := zip.NewWriter(zipfile)
+	defer archive.Close()
+
+	info, err := os.Stat(source)
+	if err != nil {
+		return err
+	}
+
+	var baseDir string
+	if info.IsDir() {
+		baseDir = filepath.Base(source)
+	}
+
+	filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		if baseDir != "" {
+			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
+		}
+		if info.IsDir() {
+			header.Name += "/"
+		}
+		header.Method = zip.Deflate
+
+		//To support archives created under Windows and to be correctly handled in Linux.
+		header.Name = filepath.ToSlash(header.Name)
+
+		writer, err := archive.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		
+		defer file.Close()
+		_, err = io.Copy(writer, file)
+		return err
+	})
+	return err
 }
