@@ -155,6 +155,13 @@ func initDirectory(destination string) {
 	// Create a new update descriptor struct
 	updateDescriptor := util.UpdateDescriptor{}
 
+	// Download the LICENSE.txt
+	downloadFile(destination, constant.LICENSE_URL, constant.LICENSE_DOWNLOAD_URL, constant.LICENSE_FILE)
+
+	// Download the NOT_A_CONTRIBUTION.txt
+	downloadFile(destination, constant.NOT_A_CONTRIBUTION_URL, constant.NOT_A_CONTRIBUTION_DOWNLOAD_URL,
+		constant.NOT_A_CONTRIBUTION_FILE)
+
 	// Process README.txt and parse values
 	processReadMe(destination, &updateDescriptor)
 
@@ -328,7 +335,7 @@ func processReadMe(directory string, updateDescriptor *util.UpdateDescriptor) {
 	} else {
 		//If error occurred, set default values
 		logger.Debug(fmt.Sprintf("Error occurred while processing ASSOCIATED_JIRAS_REGEX: %v", err))
-		logger.Debug("Setting defailt values to bug_fixes")
+		logger.Debug("Setting default values to bug_fixes")
 		updateDescriptor.Bug_fixes = make(map[string]string)
 		updateDescriptor.Bug_fixes[constant.JIRA_KEY_DEFAULT] = constant.JIRA_SUMMARY_DEFAULT
 	}
@@ -351,4 +358,18 @@ func processReadMe(directory string, updateDescriptor *util.UpdateDescriptor) {
 		updateDescriptor.Description = constant.DESCRIPTION_DEFAULT
 	}
 	logger.Debug("Processing README finished")
+}
+
+func downloadFile(directory, urlName, downloadUrl, fileName string) {
+	url, exists := os.LookupEnv(urlName)
+	if !exists {
+		url = downloadUrl
+		logger.Debug(fmt.Sprintf("Environment variable '%s' is not set. Getting file from: %s",
+			urlName, downloadUrl))
+	}
+	err := util.DownloadFile(path.Join(directory, fileName), url)
+	if err != nil {
+		util.HandleErrorAndExit(err, fmt.Sprintf("Error occurred while getting the file '%v' "+
+			"from: %s.", fileName, url))
+	}
 }

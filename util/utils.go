@@ -475,3 +475,50 @@ func GetRelativePath(file *zip.File) (relativePath string) {
 	logger.Trace(fmt.Sprintf("relativePath: %s", relativePath))
 	return
 }
+
+// Download a file from given url to the given location.
+func DownloadFile(file, url string) error {
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	// Check if the response is successful
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(fmt.Sprintf("Could not download the file from: %s", url))
+	}
+	// Create the file
+	out, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Download the content from given url as a byte array.
+func GetContentFromUrl(url string) ([]byte, error) {
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return []byte{}, err
+	}
+	defer resp.Body.Close()
+	// Check if the response is successful
+	if resp.StatusCode != http.StatusOK {
+		logger.Debug(fmt.Sprintf("Could not download the file from: %s", url))
+		return []byte{}, errors.New(fmt.Sprintf("Could not download the file from: %s", url))
+	}
+	// Read content
+	respBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte{}, err
+	}
+	return respBytes, nil
+}

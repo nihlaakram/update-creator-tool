@@ -66,10 +66,6 @@ func initializeValidateCommand(cmd *cobra.Command, args []string) {
 		util.HandleErrorAndExit(errors.New("Invalid number of argumants. Run 'wum-uc validate --help' to " +
 			"view help."))
 	}
-	// Check if LICENSE_MD5 environment is set and valid.
-	if len(os.Getenv("LICENSE_MD5")) == 0 {
-		util.HandleErrorAndExit(errors.New("Environment variable 'LICENSE_MD5' is not set."))
-	}
 	startValidation(args[0], args[1])
 }
 
@@ -298,19 +294,18 @@ func validateFile(file *zip.File, fileName, fullPath, updateName string) ([]byte
 	zippedFile.Close()
 	// Validate checksum of the LICENSE.txt file.
 	if fileName == constant.LICENSE_FILE {
-		logger.Debug(fmt.Sprintf("Checking MD5 of the '%s'", fileName))
-		actualLicenseMD5Sum := fmt.Sprintf("%x", md5.Sum(data))
-		actualLicenseMD5Sum = strings.ToLower(actualLicenseMD5Sum)
-		expectedLicenseMD5Sum := os.Getenv("LICENSE_MD5")
-		if actualLicenseMD5Sum != expectedLicenseMD5Sum {
-			logger.Debug(fmt.Sprintf("MD5 checksum failed for the file '%s': " +
-				"Expected-'%s', Actual-'%s'", fileName, expectedLicenseMD5Sum,
-				actualLicenseMD5Sum))
-			return nil, errors.New(fmt.Sprintf("'%s' in '%s' is invalid.",
-				fileName, parent))
+		err := validateMD5(fileName, parent, constant.LICENSE_MD5_URL, constant.LICENSE_MD5, data)
+		if err != nil {
+			return nil, err
 		}
 	}
-
+	// Validate checksum of the NOT_A_CONTRIBUTION.txt file.
+	if fileName == constant.NOT_A_CONTRIBUTION_FILE {
+		err := validateMD5(fileName, parent, constant.NOT_A_CONTRIBUTION_MD5_URL, constant.NOT_A_CONTRIBUTION_MD5, data)
+		if err != nil {
+			return nil, err
+		}
+	}
 	dataString := string(data)
 	dataString = util.ProcessString(dataString, "\n", true)
 
@@ -405,4 +400,24 @@ func getFileName(filename string) string {
 		filename = filename[lastIndex+1:]
 	}
 	return filename
+}
+
+func validateMD5(fileName, parent, md5DownloadUrl, md5hashName string, data []byte) error {
+	logger.Debug(fmt.Sprintf("Checking MD5 of the '%s'", fileName))
+	actualMD5Sum := fmt.Sprintf("%x", md5.Sum(data))
+	expectedMD5Sum, exists := os.LookupEnv(md5hashName)
+	if !exists {
+		expectedMD5SumByte, err := util.GetContentFromUrl(md5DownloadUrl)
+		if err != nil {
+			util.HandleErrorAndExit(err, fmt.Sprintf("Error occurred while getting md5 from: %s.",
+				md5DownloadUrl))
+		}
+		expectedMD5Sum = strings.ToLower(string(expectedMD5SumByte))
+	}
+	if actualMD5Sum != expectedMD5Sum {
+		logger.Debug(fmt.Sprintf("MD5 checksum failed for the file '%s': "+
+			"Expected-'%s', Actual-'%s'", fileName, expectedMD5Sum, actualMD5Sum))
+		return errors.New(fmt.Sprintf("'%s' in '%s' is invalid.", fileName, parent))
+	}
+	return nil
 }
