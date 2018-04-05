@@ -1,7 +1,7 @@
 #!/bin/bash
 
 target="wum-uc.go"
-version="1.1.0"
+version="1.2.0"
 
 type glide >/dev/null 2>&1 || { echo >&2 "Glide dependency management is needed to build the Update Creator Tool (https://glide.sh/).  Aborting."; exit 1; }
 
@@ -31,7 +31,6 @@ do
     zipdir="$(dirname ${target})/build/target/${zipfile}"
     mkdir -p ${zipdir}
 
-    cp -r "$(dirname ${target})/resources" ${zipdir}
     cp -r "$(dirname ${target})/README.md" ${zipdir}
     cp -r "$(dirname ${target})/LICENSE.txt" ${zipdir}
 
