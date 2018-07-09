@@ -59,7 +59,7 @@ func LoadWUMUCConfig(wumucLocalRepo string) *WUMUCConfig {
 			AppKey:   constant.BASE64_ENCODED_CONSUMER_KEY_AND_SECRET,
 		}
 
-		// Write the wumuc configuration to the config file.
+		// Write the wum-uc configuration to the config file.
 		WriteConfigFile(&wumucConfig, wumucConfigFilePath)
 		return &wumucConfig
 	} else {
@@ -70,7 +70,7 @@ func LoadWUMUCConfig(wumucLocalRepo string) *WUMUCConfig {
 
 		err = yaml.Unmarshal(data, &wumucConfig)
 		if err != nil {
-			HandleErrorAndExit(err, fmt.Sprintf("unable to load wumuc configuration from '%v'.", wumucConfigFilePath))
+			HandleErrorAndExit(err, fmt.Sprintf("unable to load wum-uc configuration from '%v'.", wumucConfigFilePath))
 		}
 
 		// Validate config.yaml
@@ -79,9 +79,23 @@ func LoadWUMUCConfig(wumucLocalRepo string) *WUMUCConfig {
 	}
 }
 
-// Todo check the visibility too
-// Write the wumuc configuration to the config file.
+// Store the given wum-uc local repository
+func SetWUMUCLocalRepo(localRepoPath string) {
+	if localRepoPath == "" {
+		HandleErrorAndExit(errors.New("local repository path is not available"))
+	}
+
+	// Create the local repo, if it does not exists
+	if _, err := os.Stat(localRepoPath); err != nil {
+		if err := os.MkdirAll(localRepoPath, 0755); err != nil {
+			HandleErrorAndExit(errors.New(fmt.Sprintf("error occured in creating wum-uc home directory at %s", localRepoPath)), err)
+		}
+	}
+}
+
+// Write wum-uc configuration to the config file.
 func WriteConfigFile(wumucConfig *WUMUCConfig, wumucConfigFilePath string) error {
+	logger.Debug(fmt.Sprintf("Writing wum-uc configs to %s file", wumucConfigFilePath))
 	data, err := yaml.Marshal(wumucConfig)
 	if err != nil {
 		return err
@@ -116,7 +130,7 @@ func (wumucConfig *WUMUCConfig) validate() {
 	}
 }
 
-//Todo
+// Returns a pointer to wumuc configuration.
 func GetWUMUCConfigs() *WUMUCConfig {
 	if &wumucConfig == nil {
 		HandleErrorAndExit(errors.New("wum-uc configuration are not available"))

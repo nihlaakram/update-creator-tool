@@ -81,6 +81,8 @@ func initConfig() {
 			util.HandleErrorAndExit(err, "Cannot determine the current user's home directory.")
 		}
 		WUMUCHome = filepath.Join(homeDirPath, constant.WUMUC_HOME_DIR_NAME)
+		logger.Debug(fmt.Sprintf("wum-uc home directory path: %s", WUMUCHome))
+		util.SetWUMUCLocalRepo(WUMUCHome)
 	}
 	viper.Set(constant.WUM_UC_HOME, WUMUCHome)
 	util.LoadWUMUCConfig(WUMUCHome)
