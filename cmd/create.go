@@ -705,7 +705,7 @@ userInputLoop:
 func getJiraSummary(jiraKey string) string {
 	var jiraSummary string
 	for {
-		util.PrintInBold(fmt.Sprintf("\tEnter JIRA_KEY_SUMMARY/GITHUB_ISSUE_SUMMARY for '%s' :", jiraKey))
+		util.PrintInBold(fmt.Sprintf("\tEnter JIRA_KEY_SUMMARY/GITHUB_ISSUE_SUMMARY for '%s': ", jiraKey))
 		jiraSum, err := util.GetUserInput()
 		util.HandleErrorAndExit(err, "Error occurred while getting input from the user.")
 		if jiraSum == "" {

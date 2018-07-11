@@ -98,7 +98,7 @@ const (
 
 	WUMUC_AUTHENTICATION_URL               = "https://api.updates.wso2.com"
 	TOKEN_API_CONTEXT                      = "token"
-	BASE64_ENCODED_CONSUMER_KEY_AND_SECRET = "cmNMWXQwcjd2azZQTTE3SVA4U3VYRDR0MjRNYTpHTlBhV2JmYVpveVhrUkdZT1FwdkIyN3EyOUlh"
+	BASE64_ENCODED_CONSUMER_KEY_AND_SECRET = ""
 	RENEW_REFRESH_TOKEN                    = "renewRefreshToken"
 	RETRIEVE_ACCESS_TOKEN                  = "getAccessToken"
 	INVALID_GRANT                          = "invalid_grant"
