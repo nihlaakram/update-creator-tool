@@ -1,10 +1,19 @@
-hash: bd2e4bd69e4282d1084396198e82a7f79be0873387a6ee183e4b9bcd627d32eb
-updated: 2018-02-22T17:23:35.283250043+05:30
+hash: 2399984b6f4ecbd0a42a2d4f9f0c01ac2f5f4f18e27bcbcf8ccf23c69d943386
+updated: 2018-10-23T14:55:32.128083+05:30
 imports:
+- name: github.com/aryann/difflib
+  version: 55c4b2b398cf71d560f802bfd62a15df42da843e
 - name: github.com/fatih/color
   version: dea9d3a26a087187530244679c1cfb3a42937794
 - name: github.com/fsnotify/fsnotify
   version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
+- name: github.com/gosuri/uilive
+  version: efb88ccd059957c48f24f9d351d33a0eb00ede41
+- name: github.com/gosuri/uitable
+  version: 36ee7e946282a3fb1cfecd476ddc9b35d8847e42
+  subpackages:
+  - util/strutil
+  - util/wordwrap
 - name: github.com/hashicorp/hcl
   version: 5550aaba7896ad2a161888b40954bc0f0787bb81
   subpackages:
@@ -26,6 +35,8 @@ imports:
   - logger
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/kardianos/osext
+  version: ae77be60afb1dcacde03767a8c37337fad28ac14
 - name: github.com/magiconair/properties
   version: 9c47895dc1ce54302908ab8a43385d1f5df2c11c
 - name: github.com/mattn/go-colorable
@@ -34,6 +45,8 @@ imports:
   version: 30a891c33c7cde7b02a981314b4228ec99380cca
 - name: github.com/mattn/go-runewidth
   version: 737072b4e32b7a5018b4a7125da8d12de90e8045
+- name: github.com/mitchellh/go-homedir
+  version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/mitchellh/mapstructure
   version: f3009df150dadf309fdee4a54ed65c124afad715
 - name: github.com/olekukonko/tablewriter
@@ -70,6 +83,14 @@ imports:
   version: ad0ff2e232ad2e37faf67087fb24bf8d04a8ce20
   subpackages:
   - msgp
+- name: github.com/wso2/wum-client
+  version: 6799fd7b8cc4174d00ffbf22c319f173e5cadd15
+  subpackages:
+  - utils
+- name: golang.org/x/crypto
+  version: 2f8be38b9a7533b8763d48273737ff6e90428a96
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/sys
   version: d5645953809d8b4752afb2c3224b1f1ad73dfa70
   subpackages:

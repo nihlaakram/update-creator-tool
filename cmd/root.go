@@ -16,22 +16,24 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
+	"strconv"
+	"time"
 
 	"github.com/ian-kent/go-log/layout"
 	"github.com/ian-kent/go-log/levels"
 	"github.com/ian-kent/go-log/log"
+	"github.com/kardianos/osext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/wso2/update-creator-tool/constant"
 	"github.com/wso2/update-creator-tool/util"
-	"io/ioutil"
-	"os/exec"
-	"path/filepath"
-	"strconv"
-	"time"
 )
 
 var (
@@ -220,9 +222,49 @@ func checkWithWUMUCAdmin() {
 	util.ProcessResponseFromServer(response, &versionResponse)
 	// Exit if the current version is no longer supported for creating updates
 	if !versionResponse.IsCompatible {
-		util.HandleErrorAndExit(errors.New(fmt.Sprintf(versionResponse.
+		util.PrintInfo(errors.New(fmt.Sprintf(versionResponse.
 			VersionMessage+"\n\t Latest version: %s \n\t Released date: %s\n",
 			versionResponse.LatestVersion.Version, versionResponse.LatestVersion.ReleaseDate)))
+		// Create folder to download the new Client
+		pathToExecutable, err := osext.ExecutableFolder()
+		if err != nil {
+			util.HandleErrorAndExit(err, "cannot identify the path to executable.")
+		}
+		folderToDownload := pathToExecutable
+		platform := make(map[string]string)
+		platform["darwin-amd64"] = "macosx-x64"
+		platform["linux-386"] = "linux-i586"
+		platform["linux-amd64"] = "linux-x64"
+		platform["windows-386"] = "windows-i586"
+		platform["windows-amd64"] = "windows-x64"
+		downloadFile := "wum-uc-" + versionResponse.LatestVersion.Version + "-" + platform[runtime.GOOS+"-"+runtime.GOARCH]
+		downloadLink := "http://product-dist.wso2.com/downloads/wum/uc-tool/" + downloadFile + ".zip"
+		zipFile := filepath.Join(folderToDownload, downloadFile+ ".zip")
+		latestFolder := filepath.Join(folderToDownload, downloadFile)
+		binFolder := filepath.Join(latestFolder, "bin")
+		util.DeleteFileIfExists(zipFile)
+		util.DeleteFileIfExists(latestFolder)
+		util.DownloadUCTool(zipFile, downloadLink)
+		// Unzip and replace
+		util.UnzipFile(zipFile, folderToDownload)
+		entries, err := ioutil.ReadDir(binFolder)
+		if err != nil {
+			return
+		}
+		for _, entry := range entries {
+			if entry.Mode()&os.ModeSymlink != 0 {
+				continue
+			}
+			target := entry.Name()
+			updatedClient := filepath.Join(binFolder, target)
+			util.DeleteFileIfExists(target)
+			err := util.CopyFile(updatedClient, target)
+			if err != nil {
+				util.HandleErrorAndExit(err, fmt.Sprintf("unable to copy file '%v' to '%v'", updatedClient), err)
+			}
+		}
+		util.PrintInfo("updates tool as been updated. Please re-run the tool.\n")
+		os.Exit(0)
 	}
 	// If there is a new version of wum-uc being released
 	if len(versionResponse.LatestVersion.Version) != 0 {

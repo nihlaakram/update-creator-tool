@@ -15,7 +15,9 @@
 package util
 
 import (
+	"archive/zip"
 	"bufio"
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -23,16 +25,17 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
-	"archive/zip"
-	"bytes"
 	"github.com/fatih/color"
 	"github.com/ian-kent/go-log/log"
 	"github.com/pkg/errors"
@@ -40,9 +43,6 @@ import (
 	"github.com/wso2/update-creator-tool/constant"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/yaml.v2"
-	"net/url"
-	"regexp"
-	"sort"
 )
 
 var logger = log.Logger()
@@ -427,7 +427,7 @@ func CopyFile(source string, dest string) (err error) {
 	_, err = io.Copy(df, sf)
 	if err == nil {
 		si, err := os.Stat(source)
-		if err != nil {
+		if err == nil {
 			return os.Chmod(dest, si.Mode())
 		}
 	}
@@ -524,6 +524,12 @@ func HandleErrorAndExit(err error, customMessage ...interface{}) {
 		}
 		os.Exit(1)
 	}
+}
+
+// This function is used to handle errors (print proper error message and exit if an error exists)
+func PrintMessageAndExit(customMessage ...interface{}) {
+	PrintInBold(append(customMessage))
+	os.Exit(0)
 }
 
 // This function is used to print error messages
@@ -1255,4 +1261,97 @@ func WriteFileToDestination(data []byte, filePath string) error {
 	}
 	logger.Trace(fmt.Sprintf("Writing content to %s completed successfully", filePath))
 	return nil
+}
+
+// Download the latest update creator tool
+func DownloadUCTool(filePath string, url string) {
+	// Create the file
+	out, err := os.Create(filePath)
+	if err != nil {
+		HandleErrorAndExit(err, fmt.Sprintf("unable to create file '%v'", filePath))
+	}
+	defer out.Close()
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		HandleErrorAndExit(err, "unable to download latest update creator tool.")
+	}
+	defer resp.Body.Close()
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		HandleErrorAndExit(err, fmt.Sprintf("unable to create file '%v'", filePath))
+	}
+}
+
+// Delete file only if it exists
+func DeleteFileIfExists(pathToFile string) {
+	if _, err := os.Stat(pathToFile); err == nil {
+		er := os.Remove(pathToFile)
+		if er != nil {
+			HandleErrorAndExit(err, "unable to delete file. ")
+		}
+	}
+}
+
+// Unzip a file to a given destination
+func UnzipFile(archive, target string) error {
+	reader, err := zip.OpenReader(archive)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(target, 0755); err != nil {
+		return err
+	}
+	for _, file := range reader.File {
+		path := filepath.Join(target, file.Name)
+		if file.FileInfo().IsDir() {
+			os.MkdirAll(path, file.Mode())
+			continue
+		}
+
+		fileReader, err := file.Open()
+		if err != nil {
+			return err
+		}
+		//Create the directory structure if it doesn't exists
+		d := filepath.Dir(path)
+		exists := IsFileExist(d)
+		if !exists {
+			if err := os.MkdirAll(d, 0755); err != nil {
+				return err
+			}
+		}
+		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+		if err != nil {
+			return err
+		}
+		if _, err := io.Copy(targetFile, fileReader); err != nil {
+			return err
+		}
+		fileReader.Close()
+		targetFile.Close()
+	}
+	return nil
+}
+
+// Check whether the file exists.
+func IsFileExist(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		} else {
+			HandleErrorAndExit(err, fmt.Sprintf("unable to read file '%v'", path))
+		}
+	}
+	return true
+}
+
+// Delete complete direcroty and all its constituents
+func DeleteDirectories(tempDirBase string) {
+	err := os.RemoveAll(tempDirBase)
+	if err != nil {
+		HandleErrorAndExit(err, fmt.Sprintf("unable to delete the file, '%v'. Please delete the file manually.",
+			tempDirBase))
+	}
 }
